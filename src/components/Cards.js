@@ -1,25 +1,23 @@
 import React from "react";
 import Card from "./Card";
 
-const Cards = ({courses}) => {
-
+const Cards = ({ courses }) => {
   let allCourses = [];
 
   const getCourses = () => {
-
     Object.values(courses).forEach((couseCategory) => {
       couseCategory.forEach((course) => {
         allCourses.push(course);
       });
     });
-    
-    return allCourses;
   };
+
+  getCourses();
 
   return (
     <div>
-      {getCourses().map((data) => {
-        <Card course={data} />;
+      {allCourses.map((data) => {
+        return <Card key={data.id} course={data} />;
       })}
     </div>
   );
