@@ -1,62 +1,51 @@
-import React, { useState } from "react";
-// import { useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar";
 import Filter from "./components/Filter";
 import Cards from "./components/Cards";
-import { apiUrl, filterData, courseData } from "./data";
+import { apiUrl, filterData } from "./data";
 import { toast } from "react-toastify";
-import Card from "./components/Card";
+import Spinner from "./components/Spinner";
 
 function App() {
-  const [courses, setCourses] = useState(courseData);
+  const [courses, setCourses] = useState(null);
 
-  console.log("CourseData - ");
-  console.log(courseData);
+  const [loading, setLoading] = useState(true);
 
-  // setCourses(courseData);
+  const [category, setCategory] = useState(filterData[0].title);
 
-  // useEffect(() => {
-  //   const fetchCardDetails = async () => {
-  //     try {
-  //       const res = await fetch(
-  //         "https://codehelp-apis.vercel.app/api/get-top-courses"
-  //       );
-  //       const output = await res.json();
-  //       setCourses(output.data);
-  //       console.log("hello");
-  //       console.log(courses);
-  //     } catch (err) {
-  //       toast.error("Something went wrong");
-  //     }
-  //   };
-
-  //   fetchCardDetails();
-  // }, []);
-
-  function filterHandler(title) {
-
-    // setCourses(courseData[title]);
-    console.log(courseData[title]);
-    
-    let allCourses = courseData[title];
-
-      return (
-        <div>
-          {allCourses.map((data) => {
-            return <Card key={data.id} course={data} />;
-          })}
-        </div>
-      );
-
-      setCourses(courseData);
+  async function fetchData() {
+    setLoading(true);
+    try {
+      let res = await fetch(apiUrl);
+      let output = await res.json();
+      setCourses(output.data);
+    } catch (err) {
+      toast.error("Something went wrong with api");
+    }
+    setLoading(false);
   }
 
-  return (
-    <div>
-      <Navbar />
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-      <Filter filterHandler={filterHandler} filterData={filterData} />
-      <Cards courses={courses} />
+  return (
+    <div className="min-h-screen flex flex-col bg-blue-900">
+      <div>
+        <Navbar />
+      </div>
+      <div className=" bg-blue-900">
+        <div>
+          <Filter category={category} setCategory={setCategory} filterData={filterData} />
+        </div>
+
+        <div
+          className="w-11/12 max-w-[1200px] mx-auto 
+          flex flex-wrap justify-center items-center min-h-[50vh]"
+        >
+          {loading ? <Spinner /> : <Cards courses={courses} category={category} />}
+        </div>
+      </div>
     </div>
   );
 }
